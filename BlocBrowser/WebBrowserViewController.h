@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  WebBrowserViewController.h
 //  BlocBrowser
 //
 //  Created by Ricardo Gonzalez on 10/1/14.
@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 
-@interface ViewController : UIViewController
-
+@interface WebBrowserViewController : UIViewController
 
 @end
-
