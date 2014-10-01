@@ -11,4 +11,6 @@
 
 @interface WebBrowserViewController : UIViewController
 
+- (void)resetWebView;
+
 @end
