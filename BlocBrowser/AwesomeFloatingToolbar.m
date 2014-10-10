@@ -17,6 +17,7 @@
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 @property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
 @property (nonatomic, strong) UIPinchGestureRecognizer *pinchGesture;
+@property (nonatomic, strong) UILongPressGestureRecognizer *longPressGesture;
 
 @end
 
@@ -68,6 +69,8 @@
         [self addGestureRecognizer:self.panGesture];
         self.pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchFired:)];
         [self addGestureRecognizer:self.pinchGesture];
+        self.longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressFired:)];
+        [self addGestureRecognizer:self.longPressGesture];
     }
     
     return self;
@@ -143,18 +146,69 @@
 
 - (void) pinchFired:(UIPinchGestureRecognizer *)recognizer {
     if (recognizer.state == UIGestureRecognizerStateChanged) {
-        //recognizer.view.transform = CGAffineTransformScale(recognizer.view.transform, recognizer.scale, recognizer.scale);
-        //recognizer.scale = 1;
-        //CGAffineTransform transform = CGAffineTransformScale(recognizer.view.transform, recognizer.scale, recognizer.scale);
+        
         
         if ([self.delegate respondsToSelector:@selector(floatingToolbar:didPinchToolbar:)]) {
-            //[self.delegate floatingToolbar:self didPinchToolbar:transform];
             [self.delegate floatingToolbar:self didPinchToolbar:recognizer];
         }
         
         NSLog(@"Pinching");
         
-        //recognizer.scale = 1;
+    }
+}
+
+- (void) longPressFired:(UILongPressGestureRecognizer *)recognizer {
+    
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
+        NSLog(@"long press occured");
+        
+        NSMutableArray *oldColors = [self.colors mutableCopy];
+        
+        for (int i = 0; i < 4; i++) {
+            if (i > 0) {
+                oldColors[i] = self.colors[i - 1];
+            } else {
+                oldColors[0] = self.colors[3];
+            }
+        }
+        
+        self.colors = [oldColors copy];
+        
+        
+        
+        /*
+        for (int i = 3; i >= 0; i--) {
+            UIColor *color = [self.labels[i] backgroundColor];
+            [oldColors insertObject:color atIndex:index];
+            index++;
+        }
+         */
+        
+        /*
+        [oldColors insertObject:[UIColor greenColor] atIndex:0];
+        for (UILabel *label in self.labels) {
+            UIColor *color = [label backgroundColor];
+            if (index < 4) {
+                [oldColors insertObject:color atIndex:index];
+                index++;
+            }
+            else {
+                [oldColors insertObject:color atIndex:0];
+                index = 1;
+            }
+        }
+         */
+        
+        
+        NSMutableArray *replacementLabels = [self.labels mutableCopy];
+        int index = 0;
+        for (UILabel *label in replacementLabels) {
+            label.backgroundColor = oldColors[index];
+            index++;
+        }
+        self.labels = [replacementLabels copy];
+        
+        
     }
 }
 
