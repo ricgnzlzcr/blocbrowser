@@ -9,6 +9,7 @@
 #import "WebBrowserViewController.h"
 #import "AwesomeFloatingToolbar.h"
 
+
 #define kBLCWebBrowserBackString NSLocalizedString(@"Back", @"Back command")
 #define kBLCWebBrowserForwardString NSLocalizedString(@"Forward", @"Forward command")
 #define kBLCWebBrowserStopString NSLocalizedString(@"Stop", @"Stop command")
@@ -35,7 +36,17 @@
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.activityIndicator];
     
+    
     // Do any additional setup after loading the view.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:YES];
+    
+    CGFloat itemHeight = 50;
+    CGFloat width = CGRectGetWidth(self.view.bounds);
+    CGFloat browserHeight = CGRectGetHeight(self.view.bounds) - itemHeight;
+    self.awesomeToolbar.frame = CGRectMake(20, browserHeight - 30, width - 40, 60);
 }
 
 - (void)loadView {
@@ -56,11 +67,20 @@
     self.awesomeToolbar = [[AwesomeFloatingToolbar alloc] initWithFourTitles:@[kBLCWebBrowserBackString, kBLCWebBrowserForwardString, kBLCWebBrowserStopString, kBLCWebBrowserRefreshString]];
     self.awesomeToolbar.delegate = self;
     
+    
+  
+    
+    
+    
     for (UIView *viewToAdd in @[self.webview, self.textField, self.awesomeToolbar]) {
         [mainView addSubview:viewToAdd];
     }
     
     self.view = mainView;
+    
+    
+    
+    
 }
 
 - (void)viewWillLayoutSubviews {
@@ -69,11 +89,12 @@
     static CGFloat itemHeight = 50;
     CGFloat width = CGRectGetWidth(self.view.bounds);
     CGFloat browserHeight = CGRectGetHeight(self.view.bounds) - itemHeight;
+    //self.awesomeToolbar.frame = CGRectMake(20, browserHeight - 30, width - 40, 60);
     
     self.textField.frame = CGRectMake(0, 0, width, itemHeight);
     self.webview.frame = CGRectMake(0, CGRectGetMaxY(self.textField.frame), width, browserHeight);
     
-    self.awesomeToolbar.frame = CGRectMake(20, browserHeight - 30, width - 40, 60);
+
 }
 
 #pragma mark - UITextFieldDelegate
@@ -182,6 +203,26 @@
     } else if ([title isEqual:kBLCWebBrowserRefreshString]) {
         [self.webview reload];
     }
+}
+
+- (void) floatingToolbar:(AwesomeFloatingToolbar *)toolbar didTryToPanWithOffset:(CGPoint)offset {
+    CGPoint startingPoint = toolbar.frame.origin;
+    CGPoint newPoint = CGPointMake(startingPoint.x + offset.x, startingPoint.y + offset.y);
+    
+    CGRect potentialNewFrame = CGRectMake(newPoint.x, newPoint.y, CGRectGetWidth(toolbar.frame), CGRectGetHeight(toolbar.frame));
+    
+    
+    if (CGRectContainsRect(self.view.bounds, potentialNewFrame)) {
+        toolbar.frame = potentialNewFrame;
+    }
+}
+
+- (void) floatingToolbar:(AwesomeFloatingToolbar *)toolbar didPinchToolbar:(UIPinchGestureRecognizer *)recognizer {
+    NSLog(@"Hello");
+    
+    recognizer.view.transform = CGAffineTransformScale(recognizer.view.transform, recognizer.scale, recognizer.scale);
+    recognizer.scale = 1;
+    
 }
 
 /*
